@@ -474,6 +474,21 @@ body.quran-reader .qreader-top #qreader-play svg{display:block;width:21px;height
   html.ios-installed main{padding-top:calc(14px + max(env(safe-area-inset-top,0px), 55px))!important;padding-bottom:calc(30px + env(safe-area-inset-bottom,0px))!important}
   html.ios-installed body.quran-reader main{padding-bottom:calc(235px + env(safe-area-inset-bottom,0px))!important}
 }
+
+/* Ajustement iPhone : une seule compensation de la barre d’état, sans espace doublé. */
+@media(max-width:520px){
+  main{padding-top:12px!important}
+  .app>aside{padding-top:14px!important}
+  .menubtn{position:relative!important;top:auto!important;margin:0 0 12px!important}
+}
+@media(max-width:520px) and (display-mode:standalone){
+  main{padding-top:max(12px, env(safe-area-inset-top, 0px))!important}
+  .app>aside{padding-top:max(14px, env(safe-area-inset-top, 0px))!important}
+}
+@media(max-width:520px){
+  html.ios-installed main{padding-top:max(12px, env(safe-area-inset-top, 0px))!important}
+  html.ios-installed .app>aside{padding-top:max(14px, env(safe-area-inset-top, 0px))!important}
+}
 </style></head><body><div class="app"><aside><h1 onclick="goHome()" style="cursor:pointer" title="Accueil"><span class="logo-ar" lang="ar">اقرأ</span><span class="logo-name">Iqra</span></h1><small>Le Coran, verset par verset</small><div class="themes" id="themes" role="group" aria-label="Couleur de l'application"></div><input id="search" class="search" placeholder="Rechercher une sourate…"><div class="surahlist" id="surahlist"></div></aside><main><button id="menubtn" class="menubtn" aria-label="Ouvrir ou fermer la liste des sourates" onclick="document.body.classList.toggle('menu-open')">☰ Menu · Sourates</button><div class="eyebrow">LES SOURATES DU CORAN</div><h2 class="heading" id="title">Al-Fatiha</h2><p class="intro" id="intro"></p><div class="toolbar"><button class="pill selected" id="all">Tous les Versets</button><button class="pill" id="favorites">Mes Favoris</button><button class="pill" id="notes">Mes Notes</button></div><div id="verses"></div></main></div><script>
 if (window.navigator.standalone === true) document.documentElement.classList.add("ios-installed");
 const names=['Al-Fatiha','Al-Baqara','Âl-ʿImrân','An-Nisâ’','Al-Mâ’ida','Al-An‘âm','Al-A‘râf','Al-Anfâl','At-Tawba','Yûnus','Hûd','Yûsuf','Ar-Ra‘d','Ibrâhîm','Al-Hijr','An-Nahl','Al-Isrâ’','Al-Kahf','Maryam','Tâ-Hâ','Al-Anbiyâ’','Al-Hajj','Al-Mu’minûn','An-Nûr','Al-Furqân','Ash-Shu‘arâ’','An-Naml','Al-Qasas','Al-‘Ankabût','Ar-Rûm','Luqmân','As-Sajda','Al-Ahzâb','Saba’','Fâtir','Yâ-Sîn','As-Sâffât','Sâd','Az-Zumar','Ghâfir','Fussilat','Ash-Shûrâ','Az-Zukhruf','Ad-Dukhân','Al-Jâthiya','Al-Ahqâf','Muhammad','Al-Fath','Al-Hujurât','Qâf','Adh-Dhâriyât','At-Tûr','An-Najm','Al-Qamar','Ar-Rahmân','Al-Wâqi‘a','Al-Hadîd','Al-Mujâdila','Al-Hashr','Al-Mumtahana','As-Saff','Al-Jumu‘a','Al-Munâfiqûn','At-Taghâbun','At-Talâq','At-Tahrîm','Al-Mulk','Al-Qalam','Al-Hâqqa','Al-Ma‘ârij','Nûh','Al-Jinn','Al-Muzzammil','Al-Muddaththir','Al-Qiyâma','Al-Insân','Al-Mursalât','An-Naba’','An-Nâzi‘ât','‘Abasa','At-Takwîr','Al-Infitâr','Al-Mutaffifîn','Al-Inshiqâq','Al-Burûj','At-Târiq','Al-A‘lâ','Al-Ghâshiya','Al-Fajr','Al-Balad','Ash-Shams','Al-Layl','Ad-Duhâ','Ash-Sharh','At-Tîn','Al-‘Alaq','Al-Qadr','Al-Bayyina','Az-Zalzala','Al-‘Âdiyât','Al-Qâri‘a','At-Takâthur','Al-‘Asr','Al-Humaza','Al-Fîl','Quraysh','Al-Mâ‘ûn','Al-Kawthar','Al-Kâfirûn','An-Nasr','Al-Masad','Al-Ikhlâs','Al-Falaq','An-Nâs'];
