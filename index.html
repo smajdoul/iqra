@@ -351,6 +351,7 @@ body.quran-reader .toolbar,body.quran-reader .intro,body.quran-reader .eyebrow{d
 .qreader-ayah{padding:13px 12px;border-bottom:1px solid var(--line);scroll-margin-top:170px}.qreader-ayah .qreader-ar{font-family:'Amiri Quran','Amiri','Noto Naskh Arabic','Traditional Arabic',serif;font-size:32px;line-height:2.25;direction:rtl;text-align:right;overflow-wrap:anywhere}.qreader-ayah .qreader-num{font-size:12px;color:var(--muted)}
 .qreader-ayah.playing{border-left:3px solid var(--rasp);background:var(--tint)}.qreader-load{display:block;margin:22px auto;padding:12px 22px;background:var(--rasp);color:white;border:0;border-radius:10px;cursor:pointer}
 @media(max-width:520px){.qreader-controls{top:0}.qreader-ayah .qreader-ar{font-size:27px}.qreader-jump select{width:100%}}
+.qreader-controls.qreader-simple{display:flex;align-items:center;gap:12px;flex-wrap:nowrap;padding:10px 12px}.qreader-simple select{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font-size:15px;font-weight:700;padding:10px 6px}.qreader-simple #qreader-play{flex:none;border:0;border-radius:9px;background:var(--rasp,#D9507F);color:white;padding:11px 16px;font-weight:700;cursor:pointer}
 </style></head><body><div class="app"><aside><h1 onclick="goHome()" style="cursor:pointer" title="Accueil"><span class="logo-ar" lang="ar">اقرأ</span><span class="logo-name">Iqra</span></h1><small>Le Coran, verset par verset</small><div class="themes" id="themes" role="group" aria-label="Couleur de l'application"></div><input id="search" class="search" placeholder="Rechercher une sourate…"><div class="surahlist" id="surahlist"></div></aside><main><button id="menubtn" class="menubtn" aria-label="Ouvrir ou fermer la liste des sourates" onclick="document.body.classList.toggle('menu-open')">☰ Sourates</button><div class="eyebrow">LES SOURATES DU CORAN</div><h2 class="heading" id="title">Al-Fatiha</h2><p class="intro" id="intro"></p><div class="toolbar"><button class="pill selected" id="all">Tous les Versets</button><button class="pill" id="favorites">Mes Favoris</button><button class="pill" id="notes">Mes Notes</button></div><div id="verses"></div></main></div><script>
 const names=['Al-Fatiha','Al-Baqara','Âl-ʿImrân','An-Nisâ’','Al-Mâ’ida','Al-An‘âm','Al-A‘râf','Al-Anfâl','At-Tawba','Yûnus','Hûd','Yûsuf','Ar-Ra‘d','Ibrâhîm','Al-Hijr','An-Nahl','Al-Isrâ’','Al-Kahf','Maryam','Tâ-Hâ','Al-Anbiyâ’','Al-Hajj','Al-Mu’minûn','An-Nûr','Al-Furqân','Ash-Shu‘arâ’','An-Naml','Al-Qasas','Al-‘Ankabût','Ar-Rûm','Luqmân','As-Sajda','Al-Ahzâb','Saba’','Fâtir','Yâ-Sîn','As-Sâffât','Sâd','Az-Zumar','Ghâfir','Fussilat','Ash-Shûrâ','Az-Zukhruf','Ad-Dukhân','Al-Jâthiya','Al-Ahqâf','Muhammad','Al-Fath','Al-Hujurât','Qâf','Adh-Dhâriyât','At-Tûr','An-Najm','Al-Qamar','Ar-Rahmân','Al-Wâqi‘a','Al-Hadîd','Al-Mujâdila','Al-Hashr','Al-Mumtahana','As-Saff','Al-Jumu‘a','Al-Munâfiqûn','At-Taghâbun','At-Talâq','At-Tahrîm','Al-Mulk','Al-Qalam','Al-Hâqqa','Al-Ma‘ârij','Nûh','Al-Jinn','Al-Muzzammil','Al-Muddaththir','Al-Qiyâma','Al-Insân','Al-Mursalât','An-Naba’','An-Nâzi‘ât','‘Abasa','At-Takwîr','Al-Infitâr','Al-Mutaffifîn','Al-Inshiqâq','Al-Burûj','At-Târiq','Al-A‘lâ','Al-Ghâshiya','Al-Fajr','Al-Balad','Ash-Shams','Al-Layl','Ad-Duhâ','Ash-Sharh','At-Tîn','Al-‘Alaq','Al-Qadr','Al-Bayyina','Az-Zalzala','Al-‘Âdiyât','Al-Qâri‘a','At-Takâthur','Al-‘Asr','Al-Humaza','Al-Fîl','Quraysh','Al-Mâ‘ûn','Al-Kawthar','Al-Kâfirûn','An-Nasr','Al-Masad','Al-Ikhlâs','Al-Falaq','An-Nâs'];
 const arabic=['بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ','الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ','الرَّحْمَٰنِ الرَّحِيمِ','مَالِكِ يَوْمِ الدِّينِ','إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ','اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ','صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ'];
@@ -705,7 +706,8 @@ function qreaderMark(){
  document.getElementById('qreader-ayah-'+qreaderIndex)?.classList.add('playing');
  const a=qreaderFlat[qreaderIndex];const status=document.querySelector('#qreader-status');
  if(status&&a)status.textContent=`${names[a.n-1]} · verset ${a.v} / ${counts[a.n-1]} · ${qreaderIndex+1} / ${qreaderFlat.length} — ${qreaderAudio.paused?'En pause':'Récitation en cours'}`;
- const b=document.querySelector('#qreader-play');if(b)b.textContent=qreaderAudio.paused?(qreaderAudio.src?'▶ Reprendre':'▶ Écouter'):'❚❚ Pause';
+ const b=document.querySelector('#qreader-play');if(b)b.textContent=qreaderAudio.paused?'▶ Play':'❚❚ Pause';
+ const sel=document.querySelector('#qreader-select');if(sel&&a)sel.value=String(a.n);
 }
 function qreaderPlay(index){
  if(index<0||index>=qreaderFlat.length){qreaderAudio.pause();qreaderMark();return}
@@ -727,19 +729,17 @@ function readerRender(){
  document.body.classList.remove('home');nav();
  document.querySelector('#title').textContent='Le Coran complet en arabe';
  document.querySelector('#intro').textContent='114 sourates · 6 236 versets';
- document.querySelector('#verses').innerHTML=`<div class="qreader-controls"><div class="qreader-buttons"><button id="qreader-play" type="button">▶ Écouter depuis le début</button><button id="qreader-prev" type="button">◀ Verset précédent</button><button id="qreader-next" type="button">Verset suivant ▶</button></div><div class="qreader-jump"><label for="qreader-select">Aller à la sourate</label><select id="qreader-select">${names.map((name,i)=>`<option value="${i+1}">${i+1}. ${esc(name)}</option>`).join('')}</select><button id="qreader-go" type="button">Afficher</button></div><p class="qreader-status" id="qreader-status" aria-live="polite"></p><p class="note">La récitation de Mishary Alafasy enchaîne les versets, sans déplacer la page. Le texte arabe reste librement défilable.</p></div><div id="qreader-text"></div><button class="qreader-load" id="qreader-more">Afficher la suite</button>`;
+ document.querySelector('#verses').innerHTML=`<div class="qreader-controls qreader-simple"><select id="qreader-select" aria-label="Choisir une sourate">${names.map((name,i)=>`<option value="${i+1}">${i+1}. ${esc(name)}</option>`).join('')}</select><button id="qreader-play" type="button" aria-label="Lire ou mettre en pause">▶ Play</button></div><div id="qreader-text"></div><button class="qreader-load" id="qreader-more">Afficher la suite</button>`;
  qreaderRendered=0;qreaderAdd();
  document.querySelector('#qreader-play').onclick=()=>{
   if(qreaderAudio.paused){if(qreaderAudio.src)qreaderAudio.play().catch(()=>qreaderMark());else qreaderPlay(qreaderIndex)}else qreaderAudio.pause();qreaderMark()
  };
- document.querySelector('#qreader-prev').onclick=()=>qreaderPlay(Math.max(0,qreaderIndex-1));
- document.querySelector('#qreader-next').onclick=()=>qreaderPlay(Math.min(qreaderFlat.length-1,qreaderIndex+1));
  document.querySelector('#qreader-more').onclick=()=>qreaderAdd();
  const more=document.querySelector('#qreader-more');
  const observer=new IntersectionObserver(entries=>{if(entries[0].isIntersecting&&current===-3&&qreaderRendered<qreaderFlat.length)qreaderAdd(90)},{root:document.querySelector('main'),rootMargin:'350px'});
  observer.observe(more);
  more.addEventListener('click',()=>{if(qreaderRendered===qreaderFlat.length)observer.disconnect()});
- document.querySelector('#qreader-go').onclick=()=>{
+ document.querySelector('#qreader-select').onchange=()=>{
   const n=Number(document.querySelector('#qreader-select').value);const i=qreaderStart[n];
   while(qreaderRendered<=i)qreaderAdd(150);
   document.getElementById('qreader-ayah-'+i)?.scrollIntoView({block:'start'});
