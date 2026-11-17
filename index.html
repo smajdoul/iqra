@@ -341,6 +341,16 @@ html[data-mode="dark"] .vbadge.ok{color:#9fd3b0}
 html[data-mode="dark"] .dsec.syn{background:rgba(127,176,141,.1)!important}
 
 @media(max-width:700px){.deep{margin:12px -10px}.dbody{padding:0 6px 10px}.dsec{padding:8px 9px}.lec{padding:8px 9px}.study{padding-left:12px;padding-right:12px}}
+</style><style>
+/* Lecture continue du Coran */
+body.quran-reader .toolbar,body.quran-reader .intro,body.quran-reader .eyebrow{display:none}
+.qreader-controls{position:sticky;top:0;z-index:12;background:var(--card,#fff);border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0 18px;box-shadow:0 5px 18px #0000000c}
+.qreader-buttons{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.qreader-buttons button,.qreader-jump button{border:0;background:var(--rasp,#D9507F);color:white;border-radius:9px;padding:10px 14px;font-weight:700;cursor:pointer}
+.qreader-jump{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}.qreader-jump select{max-width:100%;padding:9px;border:1px solid var(--line);border-radius:9px;background:var(--card,#fff);color:var(--ink)}
+.qreader-status{font-size:13px;color:var(--muted);margin:8px 0 0}.qreader-surah{font-size:22px;font-weight:750;margin:28px 0 14px;padding:14px;border-bottom:2px solid var(--gold);text-align:center}.qreader-surah .qreader-ar{font-family:'Amiri','Traditional Arabic',serif;font-size:33px;display:block;direction:rtl}
+.qreader-ayah{padding:13px 12px;border-bottom:1px solid var(--line);scroll-margin-top:170px}.qreader-ayah .qreader-ar{font-family:'Amiri Quran','Amiri','Noto Naskh Arabic','Traditional Arabic',serif;font-size:32px;line-height:2.25;direction:rtl;text-align:right;overflow-wrap:anywhere}.qreader-ayah .qreader-num{font-size:12px;color:var(--muted)}
+.qreader-ayah.playing{border-left:3px solid var(--rasp);background:var(--tint)}.qreader-load{display:block;margin:22px auto;padding:12px 22px;background:var(--rasp);color:white;border:0;border-radius:10px;cursor:pointer}
+@media(max-width:520px){.qreader-controls{top:0}.qreader-ayah .qreader-ar{font-size:27px}.qreader-jump select{width:100%}}
 </style></head><body><div class="app"><aside><h1 onclick="goHome()" style="cursor:pointer" title="Accueil"><span class="logo-ar" lang="ar">اقرأ</span><span class="logo-name">Iqra</span></h1><small>Le Coran, verset par verset</small><div class="themes" id="themes" role="group" aria-label="Couleur de l'application"></div><input id="search" class="search" placeholder="Rechercher une sourate…"><div class="surahlist" id="surahlist"></div></aside><main><button id="menubtn" class="menubtn" aria-label="Ouvrir ou fermer la liste des sourates" onclick="document.body.classList.toggle('menu-open')">☰ Sourates</button><div class="eyebrow">LES SOURATES DU CORAN</div><h2 class="heading" id="title">Al-Fatiha</h2><p class="intro" id="intro"></p><div class="toolbar"><button class="pill selected" id="all">Tous les Versets</button><button class="pill" id="favorites">Mes Favoris</button><button class="pill" id="notes">Mes Notes</button></div><div id="verses"></div></main></div><script>
 const names=['Al-Fatiha','Al-Baqara','Âl-ʿImrân','An-Nisâ’','Al-Mâ’ida','Al-An‘âm','Al-A‘râf','Al-Anfâl','At-Tawba','Yûnus','Hûd','Yûsuf','Ar-Ra‘d','Ibrâhîm','Al-Hijr','An-Nahl','Al-Isrâ’','Al-Kahf','Maryam','Tâ-Hâ','Al-Anbiyâ’','Al-Hajj','Al-Mu’minûn','An-Nûr','Al-Furqân','Ash-Shu‘arâ’','An-Naml','Al-Qasas','Al-‘Ankabût','Ar-Rûm','Luqmân','As-Sajda','Al-Ahzâb','Saba’','Fâtir','Yâ-Sîn','As-Sâffât','Sâd','Az-Zumar','Ghâfir','Fussilat','Ash-Shûrâ','Az-Zukhruf','Ad-Dukhân','Al-Jâthiya','Al-Ahqâf','Muhammad','Al-Fath','Al-Hujurât','Qâf','Adh-Dhâriyât','At-Tûr','An-Najm','Al-Qamar','Ar-Rahmân','Al-Wâqi‘a','Al-Hadîd','Al-Mujâdila','Al-Hashr','Al-Mumtahana','As-Saff','Al-Jumu‘a','Al-Munâfiqûn','At-Taghâbun','At-Talâq','At-Tahrîm','Al-Mulk','Al-Qalam','Al-Hâqqa','Al-Ma‘ârij','Nûh','Al-Jinn','Al-Muzzammil','Al-Muddaththir','Al-Qiyâma','Al-Insân','Al-Mursalât','An-Naba’','An-Nâzi‘ât','‘Abasa','At-Takwîr','Al-Infitâr','Al-Mutaffifîn','Al-Inshiqâq','Al-Burûj','At-Târiq','Al-A‘lâ','Al-Ghâshiya','Al-Fajr','Al-Balad','Ash-Shams','Al-Layl','Ad-Duhâ','Ash-Sharh','At-Tîn','Al-‘Alaq','Al-Qadr','Al-Bayyina','Az-Zalzala','Al-‘Âdiyât','Al-Qâri‘a','At-Takâthur','Al-‘Asr','Al-Humaza','Al-Fîl','Quraysh','Al-Mâ‘ûn','Al-Kawthar','Al-Kâfirûn','An-Nasr','Al-Masad','Al-Ikhlâs','Al-Falaq','An-Nâs'];
 const arabic=['بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ','الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ','الرَّحْمَٰنِ الرَّحِيمِ','مَالِكِ يَوْمِ الدِّينِ','إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ','اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ','صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ'];
@@ -399,7 +409,8 @@ const key='ayah-prototype-v2';let saved={};try{saved=JSON.parse(localStorage.get
 const store=()=>localStorage.setItem(key,JSON.stringify(saved));
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const medinanSurahs=new Set([2, 3, 4, 5, 8, 9, 13, 22, 24, 33, 47, 48, 49, 55, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 76, 98, 99, 110]);
-function goHome(){current=-1;document.body.classList.remove('menu-open');render();document.querySelector('main').scrollTo(0,0)}
+function goHome(){stopQuranReader();current=-1;document.body.classList.remove('menu-open');render();document.querySelector('main').scrollTo(0,0)}
+function readerItem(){return `<button class="surah ${current===-3?'active':''}" onclick="openQuranReader()"><i class="num">☷</i><span class="stxt"><b>Coran complet · Arabe</b><em>Lecture et récitation continues</em></span></button>`}
 function homeItem(){return `<button class="surah home ${current===-1?'active':''}" onclick="goHome()"><i class="num">⌂</i><span class="stxt"><b>Accueil</b><em>Bienvenue dans Iqra</em></span></button>`}
 function homeRender(){
  document.body.classList.add('home');
@@ -432,8 +443,8 @@ const DEEP={"4": [{"v": 3, "title": "La polygamie : ce que dit le verset, ce que
 function deepFor(n,b,e){const L=DEEP[n];if(!L)return '';const VOK="Contrôlé le 17/11/2026 sur des éditions en ligne du Tafsîr d’Ibn Kathîr (traduction anglaise, via Quran.com / QuranWorld / Alim). Le Jâmiʿ al-bayân d’al-Ṭabarî n’a pas pu être consulté directement : aucune position ne lui est prêtée au-delà de ce qui est signalé.";const P=t=>t?`<p>${esc(t)}</p>`:'';return L.filter(d=>d.v>=b&&d.v<=e).map(d=>{const lecs=d.lec&&d.lec.length?`<div class="dsec lecs"><h5>Lectures des commentateurs</h5>${d.lec.map(x=>`<div class="lec"><h6>${esc(x[0])}</h6><p><b>Thèse.</b> ${esc(x[1])}</p><p><b>Pourquoi cette lecture.</b> ${esc(x[2])}</p><p><b>Défendue par.</b> ${esc(x[3])}</p></div>`).join('')}</div>`:`<div class="dsec cmt"><h5>Ce que disent les commentateurs</h5>${d.cmt.map(c=>`<p><b>${esc(c[0])}</b> — ${esc(c[1])}</p>`).join('')}</div>`;const syn=d.syn?`<div class="dsec syn"><h5>Synthèse</h5>${P(d.syn)}</div>`:(d.ret?`<div class="dsec ret"><h5>À retenir</h5>${P(d.ret)}</div>`:'');const srcs=d.ok?`<div class="srcs"><span class="vbadge ok">Sources contrôlées en ligne</span><br>${esc(VOK)}<ul>${d.src.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:`<div class="srcs"><span class="vbadge no">Références de mémoire, non vérifiées</span><br>Les attributions à al-Ṭabarî, Ibn Kathîr ou d’autres sont données de mémoire : à contrôler dans les ouvrages avant toute citation.</div>`;return `<details class="deep"><summary><span class="dtag">Approfondissement</span><span class="dtitle">${esc(d.title)}</span><span class="dref">${esc(d.ref)}</span></summary><div class="dbody"><div class="dsec ctx"><h5>Contexte historique</h5>${P(d.ctx)}</div><div class="dsec txt"><h5>Ce que dit</h5>${P(d.txt)}</div>${lecs}<div class="dsec dbt"><h5>Débats et lectures contemporaines</h5>${P(d.dbt)}</div>${syn}${srcs}</div></details>`}).join('')}
 function nav(){
  const q=document.querySelector('#search').value.toLowerCase();
- document.querySelector('#surahlist').innerHTML=(q?'':homeItem()+favItem())+names.map((x,i)=>({x,i})).filter(o=>o.x.toLowerCase().includes(q)||String(o.i+1)===q).map(({x,i})=>`<button class="surah ${i===current?'active':''}" data-surah="${i}"><i class="num n${i%6}">${i+1}</i><span class="stxt"><b>${esc(x)}</b><em>${counts[i]} versets · ${medinanSurahs.has(i+1)?'Médine':'La Mecque'}</em></span></button>`).join('');
- document.querySelectorAll('[data-surah]').forEach(b=>b.onclick=()=>{current=Number(b.dataset.surah);mode='all';focused=1;page=0;render();document.body.classList.remove('menu-open');document.querySelector('main').scrollTo(0,0);if(false)loadQuran(current+1)});
+ document.querySelector('#surahlist').innerHTML=(q?'':homeItem()+readerItem()+favItem())+names.map((x,i)=>({x,i})).filter(o=>o.x.toLowerCase().includes(q)||String(o.i+1)===q).map(({x,i})=>`<button class="surah ${i===current?'active':''}" data-surah="${i}"><i class="num n${i%6}">${i+1}</i><span class="stxt"><b>${esc(x)}</b><em>${counts[i]} versets · ${medinanSurahs.has(i+1)?'Médine':'La Mecque'}</em></span></button>`).join('');
+ document.querySelectorAll('[data-surah]').forEach(b=>b.onclick=()=>{stopQuranReader();current=Number(b.dataset.surah);mode='all';focused=1;page=0;render();document.body.classList.remove('menu-open');document.querySelector('main').scrollTo(0,0);if(false)loadQuran(current+1)});
 }
 function notes(id){return `<label class="note" for="note-${id}">Ma réflexion personnelle</label><textarea id="note-${id}" data-note="${id}" style="width:100%;min-height:70px;border:1px solid #ddd2bf;border-radius:9px;padding:12px;margin-top:8px" placeholder="Écrire une note…">${esc(saved['note-'+id]||'')}</textarea>`}
 function fav(id){return `<button class="pill" data-fav="${id}">${saved['fav-'+id]?'★ Favori':'☆ Ajouter aux favoris'}</button>`}
@@ -601,6 +612,9 @@ function baqaraRender(){
 }
 
 function render(){
+ if(current!==-3)stopQuranReader();
+ document.body.classList.toggle('quran-reader',current===-3);
+ if(current===-3){readerRender();return}
  if(current===-1){homeRender();return}
  if(current===-2){favRender();return}
  document.body.classList.remove('home');
@@ -636,6 +650,7 @@ function render(){
 })();
 (function(){
  const au=new Audio();au.preload='none';let cur=null,tried=0;
+ document.addEventListener('iqra-reader-play',()=>au.pause());
  const pad=(x,n)=>String(x).padStart(n,'0');
  const src1=(n,v)=>'https://everyayah.com/data/Alafasy_128kbps/'+pad(n,3)+pad(v,3)+'.mp3';
  const src2=(n,v)=>{let g=v;for(let i=0;i<n-1;i++)g+=counts[i];return 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/'+g+'.mp3'};
@@ -643,13 +658,13 @@ function render(){
  function play(btn){
   const n=+btn.dataset.n,v=+btn.dataset.v,k=n+':'+v;
   if(cur&&cur.k===k){if(au.paused)au.play().catch(()=>{});else au.pause();mark();return}
-  cur={k,n,v};tried=0;au.src=src1(n,v);au.play().catch(()=>{});mark();
+  document.dispatchEvent(new Event('iqra-verse-play'));cur={k,n,v};tried=0;au.src=src1(n,v);au.play().catch(()=>{});mark();
  }
  au.addEventListener('error',()=>{if(cur&&tried===0){tried=1;au.src=src2(cur.n,cur.v);au.play().catch(()=>{})}else{const b=document.querySelector('.vplay.on');mark()}});
  au.addEventListener('play',mark);au.addEventListener('pause',mark);
  au.addEventListener('ended',()=>{
   const all=[...document.querySelectorAll('.vplay')];const i=all.findIndex(b=>cur&&b.dataset.k===cur.k);
-  if(i>=0&&all[i+1]){all[i+1].scrollIntoView({block:'center',behavior:'smooth'});play(all[i+1])}else{mark()}
+  if(i>=0&&all[i+1]){play(all[i+1])}else{mark()}
  });
  function inject(){
   document.querySelectorAll('#verses .versehead').forEach(h=>{
@@ -662,6 +677,78 @@ function render(){
  }
  new MutationObserver(inject).observe(document.querySelector('#verses'),{childList:true});inject();
 })();
+
+// Mode lecture intégrale : le texte arabe est déjà inclus dans allQuranOffline.
+// Affichage progressif pour éviter de bloquer Safari sur iPhone (6236 versets).
+const qreaderAudio=new Audio();qreaderAudio.preload='none';
+let qreaderIndex=0,qreaderRendered=0,qreaderRetry=0;
+const qreaderFlat=[];
+for(let n=1;n<=114;n++)for(let v=1;v<=counts[n-1];v++)qreaderFlat.push({n,v,ar:allQuranOffline[n]?.[v-1]?.[0]||''});
+const qreaderStart=[];{let k=0;for(let n=1;n<=114;n++){qreaderStart[n]=k;k+=counts[n-1]}}
+const qreaderPad=(v)=>String(v).padStart(3,'0');
+function stopQuranReader(){qreaderAudio.pause()}
+function openQuranReader(){current=-3;mode='all';document.body.classList.remove('menu-open');render();document.querySelector('main').scrollTo(0,0)}
+function qreaderAdd(count=90){
+ const root=document.querySelector('#qreader-text');if(!root)return;
+ const end=Math.min(qreaderRendered+count,qreaderFlat.length);let html='';
+ for(let i=qreaderRendered;i<end;i++){
+  const a=qreaderFlat[i];
+  if(a.v===1)html+=`<h3 class="qreader-surah" id="qreader-surah-${a.n}"><span class="qreader-ar" lang="ar">سورة ${esc(surahMeta[a.n]?.name||'')}</span>${a.n}. ${esc(names[a.n-1])}</h3>`;
+  html+=`<div class="qreader-ayah" id="qreader-ayah-${i}"><div class="qreader-num">${a.n}:${a.v}</div><div class="qreader-ar" lang="ar" dir="rtl">${esc(a.ar)}</div></div>`;
+ }
+ root.insertAdjacentHTML('beforeend',html);qreaderRendered=end;
+ const more=document.querySelector('#qreader-more');if(more){more.hidden=end===qreaderFlat.length;more.textContent=`Afficher la suite (${end} / ${qreaderFlat.length} versets)`}
+ qreaderMark();
+}
+function qreaderMark(){
+ document.querySelectorAll('.qreader-ayah.playing').forEach(e=>e.classList.remove('playing'));
+ document.getElementById('qreader-ayah-'+qreaderIndex)?.classList.add('playing');
+ const a=qreaderFlat[qreaderIndex];const status=document.querySelector('#qreader-status');
+ if(status&&a)status.textContent=`${names[a.n-1]} · verset ${a.v} / ${counts[a.n-1]} · ${qreaderIndex+1} / ${qreaderFlat.length} — ${qreaderAudio.paused?'En pause':'Récitation en cours'}`;
+ const b=document.querySelector('#qreader-play');if(b)b.textContent=qreaderAudio.paused?(qreaderAudio.src?'▶ Reprendre':'▶ Écouter'):'❚❚ Pause';
+}
+function qreaderPlay(index){
+ if(index<0||index>=qreaderFlat.length){qreaderAudio.pause();qreaderMark();return}
+ document.dispatchEvent(new Event('iqra-reader-play'));
+ qreaderIndex=index;qreaderRetry=0;
+ const a=qreaderFlat[index];
+ qreaderAudio.src=`https://everyayah.com/data/Alafasy_128kbps/${qreaderPad(a.n)}${qreaderPad(a.v)}.mp3`;
+ qreaderAudio.play().catch(()=>qreaderMark());qreaderMark();
+ // Aucun scroll automatique : l'utilisateur garde sa position de lecture.
+}
+qreaderAudio.addEventListener('ended',()=>qreaderPlay(qreaderIndex+1));
+qreaderAudio.addEventListener('error',()=>{
+ if(qreaderRetry++===0){const a=qreaderFlat[qreaderIndex];qreaderAudio.src=`https://cdn.islamic.network/quran/audio/128/ar.alafasy/${qreaderIndex+1}.mp3`;qreaderAudio.play().catch(()=>qreaderMark())}
+ else{qreaderAudio.pause();qreaderMark();const st=document.querySelector('#qreader-status');if(st)st.textContent='Audio indisponible. Vérifiez la connexion puis réessayez.'}
+});
+qreaderAudio.addEventListener('play',qreaderMark);qreaderAudio.addEventListener('pause',qreaderMark);
+document.addEventListener('iqra-verse-play',stopQuranReader);
+function readerRender(){
+ document.body.classList.remove('home');nav();
+ document.querySelector('#title').textContent='Le Coran complet en arabe';
+ document.querySelector('#intro').textContent='114 sourates · 6 236 versets';
+ document.querySelector('#verses').innerHTML=`<div class="qreader-controls"><div class="qreader-buttons"><button id="qreader-play" type="button">▶ Écouter depuis le début</button><button id="qreader-prev" type="button">◀ Verset précédent</button><button id="qreader-next" type="button">Verset suivant ▶</button></div><div class="qreader-jump"><label for="qreader-select">Aller à la sourate</label><select id="qreader-select">${names.map((name,i)=>`<option value="${i+1}">${i+1}. ${esc(name)}</option>`).join('')}</select><button id="qreader-go" type="button">Afficher</button></div><p class="qreader-status" id="qreader-status" aria-live="polite"></p><p class="note">La récitation de Mishary Alafasy enchaîne les versets, sans déplacer la page. Le texte arabe reste librement défilable.</p></div><div id="qreader-text"></div><button class="qreader-load" id="qreader-more">Afficher la suite</button>`;
+ qreaderRendered=0;qreaderAdd();
+ document.querySelector('#qreader-play').onclick=()=>{
+  if(qreaderAudio.paused){if(qreaderAudio.src)qreaderAudio.play().catch(()=>qreaderMark());else qreaderPlay(qreaderIndex)}else qreaderAudio.pause();qreaderMark()
+ };
+ document.querySelector('#qreader-prev').onclick=()=>qreaderPlay(Math.max(0,qreaderIndex-1));
+ document.querySelector('#qreader-next').onclick=()=>qreaderPlay(Math.min(qreaderFlat.length-1,qreaderIndex+1));
+ document.querySelector('#qreader-more').onclick=()=>qreaderAdd();
+ const more=document.querySelector('#qreader-more');
+ const observer=new IntersectionObserver(entries=>{if(entries[0].isIntersecting&&current===-3&&qreaderRendered<qreaderFlat.length)qreaderAdd(90)},{root:document.querySelector('main'),rootMargin:'350px'});
+ observer.observe(more);
+ more.addEventListener('click',()=>{if(qreaderRendered===qreaderFlat.length)observer.disconnect()});
+ document.querySelector('#qreader-go').onclick=()=>{
+  const n=Number(document.querySelector('#qreader-select').value);const i=qreaderStart[n];
+  while(qreaderRendered<=i)qreaderAdd(150);
+  document.getElementById('qreader-ayah-'+i)?.scrollIntoView({block:'start'});
+  // La sélection d'une sourate change la position de lecture, sans démarrer l'audio.
+  qreaderAudio.pause();qreaderAudio.removeAttribute('src');qreaderAudio.load();qreaderIndex=i;qreaderMark();
+ };
+ qreaderMark();
+}
+
 document.querySelector('#search').oninput=nav;
 document.querySelectorAll('.pill[id]').forEach(b=>b.onclick=()=>{mode=b.id;page=0;render()});
 fetch('https://api.alquran.cloud/v1/meta').then(r=>r.json()).then(j=>{for(const x of j.data?.surahs?.references||[])surahMeta[x.number]=x;render()}).catch(()=>{});
