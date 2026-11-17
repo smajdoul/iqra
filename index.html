@@ -956,6 +956,31 @@ function readerRender(){
  qreaderMark();
 }
 
+// Balayage horizontal sur mobile : vers la droite pour ouvrir le menu.
+// Ignorer les gestes verticaux, les curseurs et le bord gauche réservé au retour iOS.
+(function enableSwipeMenu(){
+ let startX=0,startY=0,tracking=false;
+ document.addEventListener('touchstart',function(e){
+  if(window.innerWidth>520||e.touches.length!==1){tracking=false;return;}
+  const target=e.target;
+  if(target.closest('input,select,textarea,[type=range],.qreader-controls')){tracking=false;return;}
+  const touch=e.touches[0];
+  // Le balayage système de Safari commence généralement au bord de l'écran.
+  if(touch.clientX<28&&!document.body.classList.contains('menu-open')){tracking=false;return;}
+  startX=touch.clientX;startY=touch.clientY;tracking=true;
+ },{passive:true});
+ document.addEventListener('touchend',function(e){
+  if(!tracking||window.innerWidth>520||!e.changedTouches.length)return;
+  tracking=false;
+  const dx=e.changedTouches[0].clientX-startX;
+  const dy=e.changedTouches[0].clientY-startY;
+  if(Math.abs(dx)<85||Math.abs(dx)<Math.abs(dy)*1.5)return;
+  if(dx>0&&!document.body.classList.contains('menu-open'))document.body.classList.add('menu-open');
+  else if(dx<0&&document.body.classList.contains('menu-open'))document.body.classList.remove('menu-open');
+ },{passive:true});
+ document.addEventListener('touchcancel',function(){tracking=false},{passive:true});
+})();
+
 document.querySelector('#search').oninput=nav;
 document.querySelectorAll('.pill[id]').forEach(b=>b.onclick=()=>{mode=b.id;page=0;render()});
 fetch('https://api.alquran.cloud/v1/meta').then(r=>r.json()).then(j=>{for(const x of j.data?.surahs?.references||[])surahMeta[x.number]=x;render()}).catch(()=>{});
