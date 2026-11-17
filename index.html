@@ -478,6 +478,45 @@ const PAGE_SIZE=3;
 let current=-1,mode='all',focused=1,page=0;
 const key='ayah-prototype-v2';let saved={};try{saved=JSON.parse(localStorage.getItem(key)||'{}')}catch{}
 const store=()=>localStorage.setItem(key,JSON.stringify(saved));
+// Navigation partageable : l'URL indique la page, même après actualisation.
+const IQRA_ROUTE_KEY='iqra-last-route';
+let iqraRouteReady=false;
+function iqraRoute(){
+ if(current===-3)return '#coran-complet';
+ if(current===-2)return '#favoris';
+ if(current>=0)return '#sourate/'+(current+1);
+ return '#accueil';
+}
+function iqraApplyRoute(hash){
+ const h=String(hash||'').replace(/^#/,'');
+ if(h==='accueil'||h===''){current=-1;page=0;return true}
+ if(h==='coran-complet'){current=-3;page=0;return true}
+ if(h==='favoris'){current=-2;page=0;return true}
+ const m=/^sourate\/(\d{1,3})$/.exec(h);
+ if(m){const n=Number(m[1]);if(n>=1&&n<=114){current=n-1;page=0;mode='all';focused=1;return true}}
+ return false;
+}
+function iqraSyncRoute(){
+ const route=iqraRoute();
+ try{localStorage.setItem(IQRA_ROUTE_KEY,route)}catch(e){}
+ if(location.hash!==route){
+  if(!iqraRouteReady)history.replaceState(null,'',route);
+  else history.pushState(null,'',route);
+ }
+ iqraRouteReady=true;
+}
+(function(){
+ let route=location.hash;
+ if(!route){try{route=localStorage.getItem(IQRA_ROUTE_KEY)||''}catch(e){}}
+ if(route)iqraApplyRoute(route);
+ window.addEventListener('hashchange',()=>{
+  if(!iqraApplyRoute(location.hash))return;
+  document.body.classList.remove('menu-open');
+  render();
+  document.querySelector('main')?.scrollTo(0,0);
+ });
+})();
+
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const medinanSurahs=new Set([2, 3, 4, 5, 8, 9, 13, 22, 24, 33, 47, 48, 49, 55, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 76, 98, 99, 110]);
 function goHome(){stopQuranReader();current=-1;document.body.classList.remove('menu-open');render();document.querySelector('main').scrollTo(0,0)}
@@ -683,6 +722,7 @@ function baqaraRender(){
 }
 
 function render(){
+ iqraSyncRoute();
  if(current!==-3)stopQuranReader();
  document.body.classList.toggle('quran-reader',current===-3);
  if(current===-3){readerRender();return}
