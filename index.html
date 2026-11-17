@@ -109,6 +109,8 @@ body.menu-open .app>aside{transform:none;box-shadow:6px 0 30px rgba(30,36,48,.25
 html{color-scheme:light}
 #totop{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:40;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--card,#fff);color:var(--rasp,#D9507F);font-size:22px;font-weight:700;line-height:1;cursor:pointer;box-shadow:0 4px 16px rgba(30,36,48,.22);display:flex;align-items:center;justify-content:center;padding:0}
 #totop[hidden]{display:none}
+#scrim{display:none}
+@media(max-width:520px){body.menu-open #scrim{display:block;position:fixed;inset:0;z-index:29;background:rgba(20,24,32,.45)}}
 html[data-mode="dark"] #totop{background:#1A1D23;color:#E8457C;border-color:#2c313a}
 @media(max-width:520px){
 main{height:100dvh!important}
@@ -619,6 +621,9 @@ function render(){
  setMode(md);
 })();
 (function(){
+ const sc=document.createElement('div');sc.id='scrim';document.body.appendChild(sc);
+ const close=e=>{document.body.classList.remove('menu-open');if(e&&e.preventDefault)e.preventDefault()};
+ sc.addEventListener('click',close);sc.addEventListener('touchstart',close,{passive:false});
  const b=document.createElement('button');b.id='totop';b.type='button';b.setAttribute('aria-label','Revenir en haut de la page');b.textContent='↑';b.hidden=true;document.body.appendChild(b);
  const m=document.querySelector('main');
  function upd(){b.hidden=m.scrollTop<500}
