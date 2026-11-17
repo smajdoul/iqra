@@ -110,6 +110,9 @@ html{color-scheme:light}
 #totop{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:40;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--card,#fff);color:var(--rasp,#D9507F);font-size:22px;font-weight:700;line-height:1;cursor:pointer;box-shadow:0 4px 16px rgba(30,36,48,.22);display:flex;align-items:center;justify-content:center;padding:0}
 #totop[hidden]{display:none}
 #scrim{display:none}
+.versehead{flex-wrap:wrap;gap:8px}
+.vplay{cursor:pointer}
+.vplay.on{background:var(--rasp,#D9507F)!important;color:#fff!important;border-color:var(--rasp,#D9507F)!important}
 @media(max-width:520px){body.menu-open #scrim{display:block;position:fixed;inset:0;z-index:29;background:rgba(20,24,32,.45)}}
 html[data-mode="dark"] #totop{background:#1A1D23;color:#E8457C;border-color:#2c313a}
 @media(max-width:520px){
@@ -630,6 +633,34 @@ function render(){
  m.addEventListener('scroll',upd,{passive:true});
  b.onclick=()=>m.scrollTo({top:0,behavior:'smooth'});
  new MutationObserver(upd).observe(document.querySelector('#verses'),{childList:true});upd();
+})();
+(function(){
+ const au=new Audio();au.preload='none';let cur=null,tried=0;
+ const pad=(x,n)=>String(x).padStart(n,'0');
+ const src1=(n,v)=>'https://everyayah.com/data/Alafasy_128kbps/'+pad(n,3)+pad(v,3)+'.mp3';
+ const src2=(n,v)=>{let g=v;for(let i=0;i<n-1;i++)g+=counts[i];return 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/'+g+'.mp3'};
+ function mark(){document.querySelectorAll('.vplay').forEach(b=>{const on=cur&&b.dataset.k===cur.k&&!au.paused;b.classList.toggle('on',!!on);b.textContent=on?'❚❚ Pause':'▶ Écouter'})}
+ function play(btn){
+  const n=+btn.dataset.n,v=+btn.dataset.v,k=n+':'+v;
+  if(cur&&cur.k===k){if(au.paused)au.play().catch(()=>{});else au.pause();mark();return}
+  cur={k,n,v};tried=0;au.src=src1(n,v);au.play().catch(()=>{});mark();
+ }
+ au.addEventListener('error',()=>{if(cur&&tried===0){tried=1;au.src=src2(cur.n,cur.v);au.play().catch(()=>{})}else{const b=document.querySelector('.vplay.on');mark()}});
+ au.addEventListener('play',mark);au.addEventListener('pause',mark);
+ au.addEventListener('ended',()=>{
+  const all=[...document.querySelectorAll('.vplay')];const i=all.findIndex(b=>cur&&b.dataset.k===cur.k);
+  if(i>=0&&all[i+1]){all[i+1].scrollIntoView({block:'center',behavior:'smooth'});play(all[i+1])}else{mark()}
+ });
+ function inject(){
+  document.querySelectorAll('#verses .versehead').forEach(h=>{
+   if(h.querySelector('.vplay'))return;
+   const f=h.querySelector('[data-fav]');if(!f)return;
+   const m=/^(\d+)-(\d+)$/.exec(f.dataset.fav);if(!m)return;
+   const b=document.createElement('button');b.type='button';b.className='pill vplay';b.dataset.n=m[1];b.dataset.v=m[2];b.dataset.k=m[1]+':'+m[2];b.textContent='▶ Écouter';b.setAttribute('aria-label','Écouter le verset '+m[2]);
+   b.onclick=()=>play(b);h.appendChild(b);
+  });mark();
+ }
+ new MutationObserver(inject).observe(document.querySelector('#verses'),{childList:true});inject();
 })();
 document.querySelector('#search').oninput=nav;
 document.querySelectorAll('.pill[id]').forEach(b=>b.onclick=()=>{mode=b.id;page=0;render()});
