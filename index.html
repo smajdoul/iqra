@@ -771,21 +771,48 @@ function parseNoteKey(k){
  return null;
 }
 function openDeepAt(n,v){
- // Ouvre la page contenant l’étude puis développe le commentaire exact.
- openAt(n,v);
+ // Cherche le bloc approfondi réellement rendu, même si la pagination
+ // ne correspond pas exactement au numéro de verset de l'étude.
+ const previousPage=page;
+ current=n-1;
+ mode='all';
+ focused=v;
+ page=pageFor(n,v);
+ document.body.classList.remove('menu-open');
+ const selector=`details.deep[data-deep-n="${n}"][data-deep-v="${v}"]`;
+ render();
+ let detail=document.querySelector(selector);
+ if(!detail){
+  const total=curPages;
+  for(let i=0;i<total;i++){
+   if(i===page)continue;
+   page=i;
+   render();
+   detail=document.querySelector(selector);
+   if(detail)break;
+  }
+ }
+ if(!detail){
+  page=pageFor(n,v);
+  render();
+  console.warn('Approfondissement introuvable dans les pages de la sourate',n,v);
+  return;
+ }
+ detail.open=true;
+ const targetPage=page;
  const reveal=()=>{
-  const detail=document.querySelector(`details.deep[data-deep-n="${n}"][data-deep-v="${v}"]`);
-  if(!detail)return false;
-  detail.open=true;
+  if(current!==n-1||page!==targetPage)return;
+  const el=document.querySelector(selector);
+  if(!el)return;
+  el.open=true;
   const main=document.querySelector('main');
   if(main){
-   const top=detail.getBoundingClientRect().top-main.getBoundingClientRect().top+main.scrollTop;
-   main.scrollTo({top:Math.max(0,top-18),behavior:'instant'});
-  }else detail.scrollIntoView({block:'start'});
-  return true;
+   const top=el.getBoundingClientRect().top-main.getBoundingClientRect().top+main.scrollTop;
+   main.scrollTop=Math.max(0,top-18);
+  }else el.scrollIntoView({block:'start'});
  };
  requestAnimationFrame(()=>requestAnimationFrame(reveal));
- setTimeout(reveal,130);
+ setTimeout(reveal,200);
 }
 function openAt(n,v){
  current=n-1;mode='all';focused=v||1;page=v?pageFor(n,v):0;
